@@ -28,7 +28,7 @@ namespace WinTail.Actors
                 {
                     _consoleWriterActor.Tell(new Messages.InputSuccess($"Starting processing for {msg}"));
 
-                    var tailCoordinatorActor = Context.ActorSelection("akka://MyActorSystem/user/TailCoordinatorActor");
+                    var tailCoordinatorActor = Context.ActorSelection("akka://myActorSystem/user/TailCoordinatorActor");
                     tailCoordinatorActor.Tell(new TailCoordinatorActor.StartTail(_consoleWriterActor, msg));
                 }
                 else

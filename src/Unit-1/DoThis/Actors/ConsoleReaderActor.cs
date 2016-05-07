@@ -38,7 +38,7 @@ namespace WinTail.Actors
                 return;
             }
 
-            var validationActor = Context.ActorSelection("akka://MyActorSystem/user/ValidationActor");
+            var validationActor = Context.ActorSelection("akka://myActorSystem/user/ValidationActor");
             validationActor.Tell(message);
         }
     }
