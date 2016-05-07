@@ -1,7 +1,6 @@
-﻿using System;
-using Akka.Actor;
+﻿using Akka.Actor;
 
-namespace WinTail
+namespace WinTail.Actors
 {
     public class ValidationActor : UntypedActor
     {
