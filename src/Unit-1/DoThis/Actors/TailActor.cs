@@ -9,23 +9,37 @@ namespace WinTail.Actors
     {
         private readonly IActorRef _reportedActor;
         private readonly string _filePath;
-        private readonly FileObserver _observer;
-        private readonly FileStream _fileStream;
-        private readonly StreamReader _fileStreamReader;
+        private FileObserver _observer;
+        private FileStream _fileStream;
+        private StreamReader _fileStreamReader;
 
         public TailActor(IActorRef reportedActor, string filePath)
         {
             _reportedActor = reportedActor;
             _filePath = filePath;
+        }
 
-            _observer = new FileObserver(Self, Path.GetFullPath(filePath));
+        protected override void PreStart()
+        {
+            _observer = new FileObserver(Self, Path.GetFullPath(_filePath));
             _observer.Start();
 
-            _fileStream = new FileStream(Path.GetFullPath(filePath), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            _fileStream = new FileStream(Path.GetFullPath(_filePath), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             _fileStreamReader = new StreamReader(_fileStream, Encoding.UTF8);
 
             var text = _fileStreamReader.ReadToEnd();
-            Self.Tell(new InitialRead(filePath, text));
+            Self.Tell(new InitialRead(_filePath, text));
+        }
+
+        protected override void PostStop()
+        {
+            _observer.Dispose();
+            _observer = null;
+
+            _fileStreamReader.Close();
+            _fileStreamReader.Dispose();
+
+            base.PostStop();
         }
 
         protected override void OnReceive(object message)
