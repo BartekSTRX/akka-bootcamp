@@ -11,11 +11,11 @@ namespace WinTail
     {
         public const string ExitCommand = "exit";
         public const string StartCommand = "start";
-        private readonly IActorRef _consoleWriterActor;
+        private readonly IActorRef _validationActor;
 
-        public ConsoleReaderActor(IActorRef consoleWriterActor)
+        public ConsoleReaderActor(IActorRef validationActor)
         {
-            _consoleWriterActor = consoleWriterActor;
+            _validationActor = validationActor;
         }
 
         protected override void OnReceive(object message)
@@ -24,11 +24,7 @@ namespace WinTail
             {
                 PrintInstructions();
             }
-            else if (message is Messages.InputError)
-            {
-                _consoleWriterActor.Tell((Messages.InputError)message);
-            }
-
+            
             GetAndValidateInput();
         }
 
@@ -39,32 +35,17 @@ namespace WinTail
             Console.WriteLine("Type 'exit' to quit this application at any time.\n");
         }
 
-        private static bool IsValid(string message) => message.Length % 2 == 0;
-
         private void GetAndValidateInput()
         {
             var message = Console.ReadLine();
-            if (string.IsNullOrEmpty(message))
-            {
-                Self.Tell(new Messages.NullInputError("No input received. "));
-            }
-            else if (string.Equals(message, ExitCommand, StringComparison.OrdinalIgnoreCase))
+
+            if (string.Equals(message, ExitCommand, StringComparison.OrdinalIgnoreCase))
             {
                 Context.System.Shutdown();
+                return;
             }
-            else
-            {
-                if (IsValid(message))
-                {
-                    _consoleWriterActor.Tell(new Messages.InputSuccess("Thank you. Message was valid. "));
 
-                    Self.Tell(new Messages.ContinueProcessing());
-                }
-                else
-                {
-                    Self.Tell(new Messages.InputError("Input was not valid. "));
-                }
-            }
+            _validationActor.Tell(message);
         }
     }
 }
