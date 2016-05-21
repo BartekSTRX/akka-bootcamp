@@ -19,9 +19,9 @@ namespace GithubActors
             return new GitHubClient(new ProductHeaderValue("AkkaBootcamp-Unit3"));
         }
 
-    public static GitHubClient GetClient()
-        {
-            return new GitHubClient(new ProductHeaderValue("AkkaBootcamp-Unit3"), new InMemoryCredentialStore(new Credentials(OAuthToken)));
-        }
+        public static GitHubClient GetClient() => new GitHubClient(
+            new ProductHeaderValue("AkkaBootcamp-Unit3"), 
+            new InMemoryCredentialStore(new Credentials(OAuthToken))
+        );
     }
 }
