@@ -48,6 +48,7 @@ namespace GithubActors.Actors
         private IActorRef _canAcceptJobSender;
 
         public IStash Stash { get; set; }
+
         private int _pendingJobReplies;
 
         public GithubCommanderActor()
@@ -111,17 +112,20 @@ namespace GithubActors.Actors
         protected override void PreStart()
         {
             // create three GithubCoordinatorActor instances
-            var name1 = ActorPaths.GithubCoordinatorActor.Name + "1";
-            var c1 = Context.ActorOf(Props.Create(() => new GithubCoordinatorActor()), name1);
-            var name2 = ActorPaths.GithubCoordinatorActor.Name + "2";
-            var c2 = Context.ActorOf(Props.Create(() => new GithubCoordinatorActor()), name2);
-            var name3 = ActorPaths.GithubCoordinatorActor.Name + "3";
-            var c3 = Context.ActorOf(Props.Create(() => new GithubCoordinatorActor()), name3);
+            var c1 = Context.ActorOf(Props.Create(() => new GithubCoordinatorActor()),
+                ActorPaths.GithubCoordinatorActor.Name + "1");
+            var c2 = Context.ActorOf(Props.Create(() => new GithubCoordinatorActor()),
+                ActorPaths.GithubCoordinatorActor.Name + "2");
+            var c3 = Context.ActorOf(Props.Create(() => new GithubCoordinatorActor()),
+                ActorPaths.GithubCoordinatorActor.Name + "3");
 
             // create a broadcast router who will ask all of them 
             // if they're available for work
-            _coordinator = Context.ActorOf(
-                Props.Empty.WithRouter(new BroadcastGroup(name1, name2, name3)));
+            _coordinator =
+                Context.ActorOf(Props.Empty.WithRouter(
+                    new BroadcastGroup(ActorPaths.GithubCoordinatorActor.Path + "1",
+                    ActorPaths.GithubCoordinatorActor.Path + "2",
+                    ActorPaths.GithubCoordinatorActor.Path + "3")));
 
             base.PreStart();
         }

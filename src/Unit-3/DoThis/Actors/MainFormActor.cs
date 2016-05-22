@@ -42,7 +42,9 @@ namespace GithubActors.Actors
         {
             Receive<ProcessRepo>(repo =>
             {
-                Context.ActorSelection(ActorPaths.GithubValidatorActor.Path).Tell(new GithubValidatorActor.ValidateRepo(repo.RepoUri));
+                var actorSelection = Context.ActorSelection(ActorPaths.GithubValidatorActor.Path);
+                actorSelection.Tell(new GithubValidatorActor.ValidateRepo(repo.RepoUri));
+
                 BecomeBusy(repo.RepoUri);
             });
 
